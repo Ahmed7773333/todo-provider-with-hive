@@ -1,0 +1,28 @@
+{
+    "@@locale": "fr",
+    "appBarTitle": "Liste des tâches",
+    "delete": "Supprimer",
+    "done": "Terminé!",
+    "donee": "Terminé?",
+
+    "add": "Ajouter une nouvelle tâche",
+    "language": "Langue",
+    "mode": "Mode",
+    "settings": "Paramètres",
+    "light": "Clair",
+    "dark": "Sombre",
+    "edit": "Modifier la tâche",
+    "taskTitle": "Ceci est le titre",
+    "taskDetails": "Détails de la tâche",
+    "time": "Sélectionner l''heure",
+    "save": "Enregistrer les modifications",
+    "sun": "Dim",
+    "mon": "Lun",
+    "tue": "Mar",
+    "wed": "Mer",
+    "thu": "Jeu",
+    "fri": "Ven",
+    "sat": "Sam",
+    "requiredFieldError": "Ce champ est requis"
+
+}
