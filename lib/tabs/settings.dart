@@ -22,10 +22,8 @@ class Settings extends StatelessWidget {
       light,
       dark,
     ];
-
-    final bottomodel = Provider.of<BottomModelProvider>(context);
-    String? selectedMode = mode[0];
     final bottomSheetProvider = Provider.of<BottomSheetProvider>(context);
+    String? selectedMode = mode[0];
 
     return Background(
       child: Scaffold(
@@ -99,9 +97,9 @@ class Settings extends StatelessWidget {
                   var themeProvider =
                       Provider.of<ThemeProvider>(context, listen: false);
                   if (value == 'Light') {
-                    themeProvider.setTheme(false);
+                    themeProvider.setTheme(AppTheme.lightTheme);
                   } else if (value == 'Dark') {
-                    themeProvider.setTheme(true);
+                    themeProvider.setTheme(AppTheme.darkTheme);
                   }
                   selectedMode = value.toString();
                 },
@@ -112,7 +110,7 @@ class Settings extends StatelessWidget {
           ),
         ),
         bottomSheet: bottomSheetProvider.isBottomSheetVisible
-            ? bottomodel.buildBottomSheet(context)
+            ? const BottomModelProvider()
             : null,
       ),
     );
@@ -128,10 +126,10 @@ class DropDownMenu22 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color fillColor =
-        Provider.of<ThemeProvider>(context, listen: false).isDarkMode
-            ? AppTheme.blackColor
-            : Colors.white;
+    Color fillColor = Provider.of<ThemeProvider>(context, listen: false).mode ==
+            AppTheme.darkTheme
+        ? AppTheme.blackColor
+        : Colors.white;
 
     return DropdownButtonFormField2<String>(
       isExpanded: true,

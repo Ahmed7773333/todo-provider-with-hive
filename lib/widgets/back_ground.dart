@@ -13,7 +13,7 @@ class Background extends StatelessWidget {
     final themeProvider =
         Provider.of<ThemeProvider>(context); // Get the ThemeProvider
 
-    Color containerColor = themeProvider.isDarkMode
+    Color containerColor = themeProvider.mode == AppTheme.darkTheme
         ? AppTheme.darkColor // Use dark color when the theme is dark
         : AppTheme.lightColor; // Use light color when the theme is light
 

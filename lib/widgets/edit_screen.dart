@@ -1,43 +1,51 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:table_calendar/table_calendar.dart';
 import '../app_theme.dart';
 import '../providers/database.dart';
 import '../task.dart';
 import '../widgets/back_ground.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import '../providers/calender.dart';
 import '../providers/l_d_mode.dart';
 import '../providers/language.dart';
 
-class TaskDetailsProvider extends ChangeNotifier {
-  int _index = 0;
-  int get currentIndex => _index;
-  void setIndex(int index) {
-    _index = index;
+// ignore: must_be_immutable
+class TaskDetailsProvider extends StatefulWidget {
+  int index;
+  TaskDetailsProvider(this.index, {super.key});
 
-    notifyListeners();
+  @override
+  State<TaskDetailsProvider> createState() => _TaskDetailsProviderState();
+}
+
+class _TaskDetailsProviderState extends State<TaskDetailsProvider> {
+  final formKey2 = GlobalKey<FormState>();
+  // ignore: non_constant_identifier_names
+  late Box TaskBox;
+  final TextEditingController titleControl = TextEditingController();
+  final TextEditingController detailControl = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    TaskBox = Hive.box('tasks');
+    if (widget.index < TaskBox.length) {
+      titleControl.text = TaskBox.getAt(widget.index)?.title ?? '';
+      detailControl.text = TaskBox.getAt(widget.index)?.detail ?? '';
+    }
   }
 
-  final formKey2 = GlobalKey<FormState>();
-
-  Widget buildEditScreen(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final languageProvider = Provider.of<LanguageProvider>(context);
-    final calendarProvider = Provider.of<CalendarProvider>(context);
     final taskProvider = Provider.of<TaskProvider>(context);
-    String title = taskProvider.tasks[_index].title;
-    String detail = taskProvider.tasks[_index].detail;
-    final TextEditingController titleControl =
-        TextEditingController(text: title);
 
-    final TextEditingController detailControl =
-        TextEditingController(text: detail);
-    bool done = taskProvider.tasks[_index].done;
-    calendarProvider.setFocusedDay(taskProvider.tasks[_index].time);
-    Color cardColor =
-        themeProvider.isDarkMode ? AppTheme.blackColor : AppTheme.lightColor;
+    bool done = taskProvider.tasks[widget.index].done;
+    Color cardColor = themeProvider.mode == AppTheme.darkTheme
+        ? AppTheme.blackColor
+        : AppTheme.lightColor;
     return Background(
       child: Padding(
         padding:
@@ -84,88 +92,31 @@ class TaskDetailsProvider extends ChangeNotifier {
                     alignment: Alignment.centerLeft,
                     child: InkWell(
                       onTap: () {
-                        showDialog(
+                        showDatePicker(
+                          locale: languageProvider.appLocale,
                           context: context,
-                          builder: (BuildContext context) {
-                            return StatefulBuilder(
-                              builder: (BuildContext context,
-                                      void Function(void Function())
-                                          setState) =>
-                                  AlertDialog(
-                                backgroundColor: themeProvider.isDarkMode
-                                    ? AppTheme.blackColor
-                                    : Colors.white,
-                                content: SizedBox(
-                                  height: MediaQuery.of(context).size.height *
-                                      (520 / 870),
-                                  width: MediaQuery.of(context).size.width *
-                                      (390 / 412),
-                                  child: Column(
-                                    children: [
-                                      TableCalendar(
-                                        daysOfWeekHeight:
-                                            MediaQuery.of(context).size.height *
-                                                (28 / 870),
-                                        firstDay: DateTime.utc(2010, 10, 16),
-                                        lastDay: DateTime.utc(2030, 3, 14),
-                                        availableGestures:
-                                            AvailableGestures.all,
-                                        headerStyle: const HeaderStyle(
-                                            formatButtonVisible: false,
-                                            titleCentered: true),
-                                        selectedDayPredicate: (day) {
-                                          return isSameDay(
-                                              day, calendarProvider.focusedDay);
-                                        },
-                                        focusedDay: calendarProvider.focusedDay,
-                                        locale: (languageProvider.appLocale)
-                                            .toString(),
-                                        onDaySelected: (day, focusedDay) {
-                                          setState(() => calendarProvider
-                                              .setFocusedDay(day));
-                                        },
-                                        onPageChanged: (focusedDay) {
-                                          calendarProvider
-                                              .setFocusedDay(focusedDay);
-                                        },
-                                      ),
-                                      SizedBox(
-                                        height:
-                                            MediaQuery.of(context).size.height *
-                                                (20 / 870),
-                                      ),
-                                      ElevatedButton.icon(
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: AppTheme.blueColor,
-                                        ),
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        icon: const Icon(Icons.check),
-                                        label: const Text('ok'),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime.now()
+                              .subtract(const Duration(days: 365)),
+                          lastDate: DateTime.now().add(
+                            const Duration(days: 365),
+                          ),
                         );
                       },
                       child: Text(
                         AppLocalizations.of(context)!.time,
                         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                            color: themeProvider.isDarkMode
+                            color: themeProvider.mode == AppTheme.darkTheme
                                 ? AppTheme.grayColor
                                 : Colors.black45),
                       ),
                     ),
                   ),
                   Text(
-                    DateFormat('y-M-d').format(calendarProvider.focusedDay),
+                    DateFormat('y-M-d').format(DateTime.now()),
                     style: Theme.of(context).textTheme.bodyMedium!.copyWith(
                         fontSize: 18,
-                        color: themeProvider.isDarkMode
+                        color: themeProvider.mode == AppTheme.darkTheme
                             ? AppTheme.grayColor
                             : Colors.black45),
                   ),
@@ -188,18 +139,18 @@ class TaskDetailsProvider extends ChangeNotifier {
                         onTap: () {
                           done
                               ? taskProvider.updateTask(
-                                  _index,
+                                  widget.index,
                                   Task(
-                                      title: title,
-                                      detail: detail,
-                                      time: calendarProvider.focusedDay,
+                                      title: titleControl.text,
+                                      detail: detailControl.text,
+                                      time: DateTime.now(),
                                       done: false))
                               : taskProvider.updateTask(
-                                  _index,
+                                  widget.index,
                                   Task(
-                                      title: title,
-                                      detail: detail,
-                                      time: calendarProvider.focusedDay,
+                                      title: titleControl.text,
+                                      detail: detailControl.text,
+                                      time: DateTime.now(),
                                       done: true));
                         },
                         child: Icon(
@@ -219,14 +170,13 @@ class TaskDetailsProvider extends ChangeNotifier {
                       if (formKey2.currentState?.validate() ?? false) {
                         String titleTask = titleControl.text;
                         String detailTask = detailControl.text;
-                        DateTime time = calendarProvider.focusedDay;
+                        DateTime time = DateTime.now();
                         Task task = Task(
                             title: titleTask,
                             detail: detailTask,
                             time: time,
                             done: done);
-                        taskProvider.updateTask(_index, task);
-                        calendarProvider.setFocusedDay(DateTime.now());
+                        taskProvider.updateTask(widget.index, task);
                         Navigator.pop(context);
                       }
                     },
@@ -253,15 +203,16 @@ class TextFiild extends StatelessWidget {
 
   TextEditingController control = TextEditingController();
   TextFiild(
-      {required this.hint, this.lines = 1, required this.control, super.key});
+      {super.key, required this.hint, this.lines = 1, required this.control});
 
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
-    Color textColor =
-        themeProvider.isDarkMode ? AppTheme.grayColor : Colors.black45;
-    return TextFormField(      style: Theme.of(context).textTheme.bodyMedium,
-
+    Color textColor = themeProvider.mode == AppTheme.darkTheme
+        ? AppTheme.grayColor
+        : Colors.black45;
+    return TextFormField(
+      style: Theme.of(context).textTheme.bodyMedium,
       controller: control,
       validator: (value) {
         if (value?.trim().isEmpty ?? true) {

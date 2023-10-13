@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../app_theme.dart';
-import '../providers/calender.dart';
 import '../providers/database.dart';
 import '../tabs/settings.dart';
 import '../tabs/to_do_list_screen.dart';
@@ -36,12 +35,11 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
   @override
   Widget build(BuildContext context) {
     final bottomSheetProvider = Provider.of<BottomSheetProvider>(context);
-    final calendarProvider = Provider.of<CalendarProvider>(context);
     final taskProvider = Provider.of<TaskProvider>(context);
-    final bottomodel = Provider.of<BottomModelProvider>(context);
 
     Color shadowCOlor =
-        Provider.of<ThemeProvider>(context, listen: false).isDarkMode
+        Provider.of<ThemeProvider>(context, listen: false).mode ==
+                AppTheme.darkTheme
             ? Colors.grey.shade800
             : Colors.white;
     return Background(
@@ -99,15 +97,15 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
           child: FloatingActionButton(
             onPressed: () {
               if (bottomSheetProvider.isBottomSheetVisible) {
-                if (bottomodel.formKey.currentState?.validate() ?? false) {
-                  String title = bottomodel.titleController.text;
-                  String detail = bottomodel.detailsController.text;
-                  DateTime time = calendarProvider.focusedDay;
+                if (BottomModelProvider.formKey.currentState?.validate() ??
+                    false) {
                   Task task = Task(
-                      title: title, detail: detail, time: time, done: false);
+                      title: BottomModelProvider.titleController.text,
+                      detail: BottomModelProvider.detailsController.text,
+                      time: DateTime.now(),
+                      done: false);
                   taskProvider.addTask(task);
-                  calendarProvider.setFocusedDay(DateTime.now());
-                  bottomodel.clearControllers();
+                  BottomModelProvider.clearControllers();
                   bottomSheetProvider.hideBottomSheet();
                 }
               } else {
@@ -125,7 +123,6 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
   }
 
   void _navigateToTab(int index) {
-    // This function allows you to navigate to a specific tab
     _pageController.animateToPage(
       index,
       duration: const Duration(milliseconds: 500),

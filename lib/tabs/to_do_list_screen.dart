@@ -2,7 +2,7 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-
+import 'package:calendar_timeline/calendar_timeline.dart';
 import '../app_theme.dart';
 import '../assets.dart';
 import '../providers/database.dart';
@@ -31,8 +31,6 @@ class _ToDoListScreenState extends State<ToDoListScreen> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final taskProvider = Provider.of<TaskProvider>(context);
     final languageProvider = Provider.of<LanguageProvider>(context);
-    final bottomodel = Provider.of<BottomModelProvider>(context);
-    final detailsScreen = Provider.of<TaskDetailsProvider>(context);
 
     return Background(
       child: Scaffold(
@@ -57,40 +55,13 @@ class _ToDoListScreenState extends State<ToDoListScreen> {
             SizedBox(
               height: MediaQuery.of(context).size.height * (47 / 870),
             ),
-            Row(
-              children: [
-                CalenderDay(DateFormat('E').format(DateTime.now()),
-                    DateTime.now().day.toString()),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * (20 / 412),
+            CalendarTimeline(
+                initialDate: DateTime.now(),
+                firstDate: DateTime.now().subtract(const Duration(days: 365)),
+                lastDate: DateTime.now().add(
+                  const Duration(days: 365),
                 ),
-                CalenderDay(
-                    DateFormat('E')
-                        .format(DateTime.now().add(const Duration(days: 1))),
-                    DateTime.now().add(const Duration(days: 1)).day.toString()),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * (20 / 412),
-                ),
-                CalenderDay(
-                    DateFormat('E')
-                        .format(DateTime.now().add(const Duration(days: 2))),
-                    DateTime.now().add(const Duration(days: 2)).day.toString()),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * (20 / 412),
-                ),
-                CalenderDay(
-                    DateFormat('E')
-                        .format(DateTime.now().add(const Duration(days: 3))),
-                    DateTime.now().add(const Duration(days: 3)).day.toString()),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width * (20 / 412),
-                ),
-                CalenderDay(
-                    DateFormat('E')
-                        .format(DateTime.now().add(const Duration(days: 4))),
-                    DateTime.now().add(const Duration(days: 4)).day.toString()),
-              ],
-            ),
+                onDateSelected: (date) => debugPrint('$date')),
             SizedBox(
               height: MediaQuery.of(context).size.height * (47 / 870),
             ),
@@ -145,9 +116,10 @@ class _ToDoListScreenState extends State<ToDoListScreen> {
                                   height: MediaQuery.of(context).size.height *
                                       (115 / 870),
                                   decoration: ShapeDecoration(
-                                    color: themeProvider.isDarkMode
-                                        ? AppTheme.blackColor
-                                        : Colors.white,
+                                    color:
+                                        themeProvider.mode == AppTheme.darkTheme
+                                            ? AppTheme.blackColor
+                                            : Colors.white,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(15),
                                     ),
@@ -203,7 +175,8 @@ class _ToDoListScreenState extends State<ToDoListScreen> {
                                               ImageIcon(
                                                 AssetImage(Assets.discovery),
                                                 size: 14,
-                                                color: themeProvider.isDarkMode
+                                                color: themeProvider.mode ==
+                                                        AppTheme.darkTheme
                                                     ? AppTheme.lightColor
                                                     : AppTheme.blackColor,
                                               ),
@@ -303,8 +276,7 @@ class _ToDoListScreenState extends State<ToDoListScreen> {
                               ),
                           openBuilder:
                               (BuildContext context, void Function() action) {
-                            detailsScreen.setIndex(index);
-                            return detailsScreen.buildEditScreen(context);
+                            return TaskDetailsProvider(index);
                           }),
                   itemCount: taskProvider.tasks.length,
                   separatorBuilder: (BuildContext context, int index) =>
@@ -317,7 +289,7 @@ class _ToDoListScreenState extends State<ToDoListScreen> {
           ]),
         ),
         bottomSheet: bottomSheetProvider.isBottomSheetVisible
-            ? bottomodel.buildBottomSheet(context)
+            ? const BottomModelProvider()
             : null,
       ),
     );
@@ -333,10 +305,10 @@ class CalenderDay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     bool today = DateTime.now().day.toString() == dayss;
-    Color fillColor =
-        Provider.of<ThemeProvider>(context, listen: false).isDarkMode
-            ? AppTheme.blackColor
-            : Colors.white;
+    Color fillColor = Provider.of<ThemeProvider>(context, listen: false).mode ==
+            AppTheme.darkTheme
+        ? AppTheme.blackColor
+        : Colors.white;
     return Container(
       alignment: Alignment.center,
       width: MediaQuery.of(context).size.width * (56 / 412),
