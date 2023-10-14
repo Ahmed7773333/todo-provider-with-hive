@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
@@ -12,9 +13,9 @@ class AppTheme {
   static Color iconColor = const Color(0xffC8C9CB);
   static ThemeData lightTheme = ThemeData(
     bottomSheetTheme: const BottomSheetThemeData(backgroundColor: Colors.white),
-    bottomAppBarTheme: const BottomAppBarTheme(
-        height: 85,
-        shape: CircularNotchedRectangle(),
+    bottomAppBarTheme: BottomAppBarTheme(
+        height: 85.h,
+        shape: const CircularNotchedRectangle(),
         color: Colors.white,
         elevation: 5,
         shadowColor: Colors.white),
@@ -27,22 +28,22 @@ class AppTheme {
     textTheme: TextTheme(
       bodySmall: GoogleFonts.poppins(
         color: blackColor,
-        fontSize: 18,
+        fontSize: 18.sp,
         fontWeight: FontWeight.w700,
       ),
       bodyMedium: GoogleFonts.inter(
         color: blackColor,
-        fontSize: 20,
+        fontSize: 20.sp,
         fontWeight: FontWeight.w400,
       ),
       bodyLarge: GoogleFonts.poppins(
         color: lightColor,
-        fontSize: 22,
+        fontSize: 22.sp,
         fontWeight: FontWeight.w700,
       ),
       titleSmall: GoogleFonts.roboto(
         color: blackColor,
-        fontSize: 15,
+        fontSize: 15.sp,
         fontWeight: FontWeight.w700,
         letterSpacing: 0.23,
       ),
@@ -51,7 +52,7 @@ class AppTheme {
   static ThemeData darkTheme = ThemeData(
     bottomSheetTheme: BottomSheetThemeData(backgroundColor: blackColor),
     bottomAppBarTheme: BottomAppBarTheme(
-        height: 85,
+        height: 85.h,
         shape: const CircularNotchedRectangle(),
         color: blackColor,
         elevation: 5,
@@ -65,22 +66,22 @@ class AppTheme {
     textTheme: TextTheme(
       bodySmall: GoogleFonts.poppins(
         color: lightColor,
-        fontSize: 18,
+        fontSize: 18.sp,
         fontWeight: FontWeight.w700,
       ),
       bodyMedium: GoogleFonts.inter(
         color: lightColor,
-        fontSize: 20,
+        fontSize: 20.sp,
         fontWeight: FontWeight.w400,
       ),
       bodyLarge: GoogleFonts.poppins(
         color: darkColor,
-        fontSize: 22,
+        fontSize: 22.sp,
         fontWeight: FontWeight.w700,
       ),
       titleSmall: GoogleFonts.roboto(
         color: lightColor,
-        fontSize: 15,
+        fontSize: 15.sp,
         fontWeight: FontWeight.w700,
         letterSpacing: 0.23,
       ),

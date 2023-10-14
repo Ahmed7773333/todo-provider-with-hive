@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import '../app_theme.dart';
 import '../providers/database.dart';
@@ -61,7 +62,7 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
               IconButton(
                 icon: Icon(
                   Icons.list,
-                  size: 35,
+                  size: 35.w,
                   color: _currentIndex == 0
                       ? AppTheme.blueColor
                       : AppTheme.iconColor,
@@ -74,7 +75,7 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
               IconButton(
                 icon: Icon(
                   Icons.settings_outlined,
-                  size: 35,
+                  size: 35.w,
                   color: _currentIndex == 1
                       ? AppTheme.blueColor
                       : AppTheme.iconColor,
@@ -91,21 +92,21 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
           decoration: BoxDecoration(
               border: Border.all(
                 color: shadowCOlor,
-                width: 5,
+                width: 5.w,
               ),
-              borderRadius: BorderRadius.circular(35)),
+              borderRadius: BorderRadius.circular(35.r)),
           child: FloatingActionButton(
             onPressed: () {
               if (bottomSheetProvider.isBottomSheetVisible) {
-                if (BottomModelProvider.formKey.currentState?.validate() ??
+                if (AddTaskBottomSheet.formKey.currentState?.validate() ??
                     false) {
                   Task task = Task(
-                      title: BottomModelProvider.titleController.text,
-                      detail: BottomModelProvider.detailsController.text,
-                      time: DateTime.now(),
+                      title: AddTaskBottomSheet.titleController.text,
+                      detail: AddTaskBottomSheet.detailsController.text,
+                      time: bottomSheetProvider.selectedTime,
                       done: false);
                   taskProvider.addTask(task);
-                  BottomModelProvider.clearControllers();
+                  AddTaskBottomSheet.clearControllers();
                   bottomSheetProvider.hideBottomSheet();
                 }
               } else {
@@ -114,7 +115,7 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
             },
             child: Icon(
               bottomSheetProvider.buttonIcon,
-              size: 40,
+              size: 40.w,
             ),
           ),
         ),

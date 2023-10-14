@@ -10,6 +10,7 @@ import 'providers/database.dart';
 import 'providers/l_d_mode.dart';
 import 'providers/language.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'task.dart';
 import 'widgets/bottom_bar.dart';
@@ -50,16 +51,21 @@ class ToDoApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final languageProvider = Provider.of<LanguageProvider>(context);
-    return MaterialApp(
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
-      locale: languageProvider.appLocale,
-      debugShowCheckedModeBanner: false,
-      theme: themeProvider.mode,
-      initialRoute: BottomBarScreen.routeName,
-      routes: {
-        BottomBarScreen.routeName: (context) => const BottomBarScreen(),
-      },
+    return ScreenUtilInit(
+      designSize: const Size(412, 870),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      child: MaterialApp(
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        locale: languageProvider.appLocale,
+        debugShowCheckedModeBanner: false,
+        theme: themeProvider.mode,
+        initialRoute: BottomBarScreen.routeName,
+        routes: {
+          BottomBarScreen.routeName: (context) => const BottomBarScreen(),
+        },
+      ),
     );
   }
 }

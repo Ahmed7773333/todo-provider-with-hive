@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:todoo_app/providers/bottom_sheet.dart';
 import '../app_theme.dart';
 import '../providers/l_d_mode.dart';
 import '../providers/language.dart';
 
-class BottomModelProvider extends StatelessWidget {
+class AddTaskBottomSheet extends StatefulWidget {
   static final TextEditingController titleController = TextEditingController();
   static final TextEditingController detailsController =
       TextEditingController();
   static final formKey = GlobalKey<FormState>();
 
-  const BottomModelProvider({super.key});
+  const AddTaskBottomSheet({super.key});
 
   static void clearControllers() {
     titleController.clear();
@@ -20,17 +22,25 @@ class BottomModelProvider extends StatelessWidget {
   }
 
   @override
+  State<AddTaskBottomSheet> createState() => _AddTaskBottomSheetState();
+}
+
+class _AddTaskBottomSheetState extends State<AddTaskBottomSheet> {
+  static DateTime selectedDate = DateTime.now();
+
+  @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final languageProvider = Provider.of<LanguageProvider>(context);
+    final bottomSheetProvider = Provider.of<BottomSheetProvider>(context);
 
     return Container(
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height * (360 / 870),
+      width: 1.sw,
+      height: 360.h,
       color: Colors.transparent,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16).w,
       child: Form(
-        key: formKey,
+        key: AddTaskBottomSheet.formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -42,31 +52,32 @@ class BottomModelProvider extends StatelessWidget {
                   .bodyMedium!
                   .copyWith(fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: MediaQuery.of(context).size.height * (16 / 870)),
+            SizedBox(height: 16.h),
             TextFiild(
               hint: AppLocalizations.of(context)!.taskTitle,
-              control: titleController,
+              control: AddTaskBottomSheet.titleController,
             ),
-            SizedBox(height: MediaQuery.of(context).size.height * (16 / 870)),
+            SizedBox(height: 16.h),
             TextFiild(
               hint: AppLocalizations.of(context)!.taskDetails,
-              control: detailsController,
+              control: AddTaskBottomSheet.detailsController,
             ),
-            SizedBox(height: MediaQuery.of(context).size.height * (16 / 870)),
+            SizedBox(height: 16.h),
             Align(
               alignment: Alignment.centerLeft,
               child: InkWell(
-                onTap: () {
-                  showDatePicker(
-                    locale: languageProvider.appLocale,
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate:
-                        DateTime.now().subtract(const Duration(days: 365)),
-                    lastDate: DateTime.now().add(
-                      const Duration(days: 365),
-                    ),
-                  );
+                onTap: () async {
+                  DateTime? chosenDate = await showDatePicker(
+                      locale: languageProvider.appLocale,
+                      context: context,
+                      initialDate: selectedDate,
+                      firstDate: DateTime.now(),
+                      lastDate: DateTime.now().add(const Duration(days: 365)));
+
+                  if (chosenDate == null) return;
+                  selectedDate = chosenDate;
+                  bottomSheetProvider.setTime(selectedDate);
+                  setState(() {});
                 },
                 child: Text(
                   AppLocalizations.of(context)!.time,
@@ -79,9 +90,9 @@ class BottomModelProvider extends StatelessWidget {
               ),
             ),
             Text(
-              DateFormat('y-M-d').format(DateTime.now()),
+              DateFormat('y-M-d').format(selectedDate),
               style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                    fontSize: 18,
+                    fontSize: 18.sp,
                     color: themeProvider.mode == AppTheme.darkTheme
                         ? AppTheme.grayColor
                         : Colors.black45,

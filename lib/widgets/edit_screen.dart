@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../app_theme.dart';
+import '../providers/bottom_sheet.dart';
 import '../providers/database.dart';
 import '../task.dart';
 import '../widgets/back_ground.dart';
@@ -12,8 +14,9 @@ import '../providers/language.dart';
 
 // ignore: must_be_immutable
 class TaskDetailsProvider extends StatefulWidget {
+  Task task;
   int index;
-  TaskDetailsProvider(this.index, {super.key});
+  TaskDetailsProvider({required this.task, super.key, required this.index});
 
   @override
   State<TaskDetailsProvider> createState() => _TaskDetailsProviderState();
@@ -30,37 +33,40 @@ class _TaskDetailsProviderState extends State<TaskDetailsProvider> {
   void initState() {
     super.initState();
     TaskBox = Hive.box('tasks');
-    if (widget.index < TaskBox.length) {
-      titleControl.text = TaskBox.getAt(widget.index)?.title ?? '';
-      detailControl.text = TaskBox.getAt(widget.index)?.detail ?? '';
+    if (widget.task.isInBox) {
+      titleControl.text = widget.task.title;
+      detailControl.text = widget.task.detail;
     }
   }
+
+  DateTime selectedDate = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final languageProvider = Provider.of<LanguageProvider>(context);
     final taskProvider = Provider.of<TaskProvider>(context);
+    final bottomSheetProvider = Provider.of<BottomSheetProvider>(context);
 
-    bool done = taskProvider.tasks[widget.index].done;
+    bool done = widget.task.done;
     Color cardColor = themeProvider.mode == AppTheme.darkTheme
         ? AppTheme.blackColor
         : AppTheme.lightColor;
     return Background(
       child: Padding(
-        padding:
-            EdgeInsets.all(MediaQuery.of(context).size.height * (12 / 870)),
+        padding: EdgeInsets.all(12.h),
         child: Card(
           color: cardColor,
           elevation: 18,
           shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
-              side: const BorderSide()),
+            borderRadius: BorderRadius.circular(18.r),
+            side: const BorderSide(),
+          ),
           child: Container(
             width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height * (800 / 870),
+            height: 800.h,
             color: Colors.transparent,
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16).w,
             child: Form(
               key: formKey2,
               child: Column(
@@ -74,55 +80,56 @@ class _TaskDetailsProviderState extends State<TaskDetailsProvider> {
                         .copyWith(fontWeight: FontWeight.bold),
                   ),
                   SizedBox(
-                      height: MediaQuery.of(context).size.height * (16 / 870)),
+                    height: 16.h,
+                  ),
                   TextFiild(
                     hint: AppLocalizations.of(context)!.taskTitle,
                     control: titleControl,
                   ),
-                  SizedBox(
-                      height: MediaQuery.of(context).size.height * (16 / 870)),
+                  SizedBox(height: 16.h),
                   TextFiild(
                     hint: AppLocalizations.of(context)!.taskDetails,
                     control: detailControl,
                     lines: 10,
                   ),
-                  SizedBox(
-                      height: MediaQuery.of(context).size.height * (16 / 870)),
+                  SizedBox(height: 16.h),
                   Align(
                     alignment: Alignment.centerLeft,
                     child: InkWell(
-                      onTap: () {
-                        showDatePicker(
-                          locale: languageProvider.appLocale,
-                          context: context,
-                          initialDate: DateTime.now(),
-                          firstDate: DateTime.now()
-                              .subtract(const Duration(days: 365)),
-                          lastDate: DateTime.now().add(
-                            const Duration(days: 365),
-                          ),
-                        );
+                      onTap: () async {
+                        DateTime? chosenDate = await showDatePicker(
+                            locale: languageProvider.appLocale,
+                            context: context,
+                            initialDate: selectedDate,
+                            firstDate: DateTime.now(),
+                            lastDate:
+                                DateTime.now().add(const Duration(days: 365)));
+
+                        if (chosenDate == null) return;
+                        selectedDate = chosenDate;
+                        bottomSheetProvider.setTime(selectedDate);
+                        setState(() {});
                       },
                       child: Text(
                         AppLocalizations.of(context)!.time,
                         style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                            color: themeProvider.mode == AppTheme.darkTheme
-                                ? AppTheme.grayColor
-                                : Colors.black45),
+                              color: themeProvider.mode == AppTheme.darkTheme
+                                  ? AppTheme.grayColor
+                                  : Colors.black45,
+                            ),
                       ),
                     ),
                   ),
                   Text(
-                    DateFormat('y-M-d').format(DateTime.now()),
+                    DateFormat('y-M-d').format(selectedDate),
                     style: Theme.of(context).textTheme.bodyMedium!.copyWith(
-                        fontSize: 18,
-                        color: themeProvider.mode == AppTheme.darkTheme
-                            ? AppTheme.grayColor
-                            : Colors.black45),
+                          fontSize: 18.sp,
+                          color: themeProvider.mode == AppTheme.darkTheme
+                              ? AppTheme.grayColor
+                              : Colors.black45,
+                        ),
                   ),
-                  const Spacer(
-                    flex: 5,
-                  ),
+                  const Spacer(flex: 5),
                   Row(
                     children: [
                       Text(
@@ -132,26 +139,11 @@ class _TaskDetailsProviderState extends State<TaskDetailsProvider> {
                             .bodyLarge!
                             .copyWith(color: AppTheme.greenColor),
                       ),
-                      const Spacer(
-                        flex: 5,
-                      ),
+                      const Spacer(flex: 5),
                       InkWell(
                         onTap: () {
-                          done
-                              ? taskProvider.updateTask(
-                                  widget.index,
-                                  Task(
-                                      title: titleControl.text,
-                                      detail: detailControl.text,
-                                      time: DateTime.now(),
-                                      done: false))
-                              : taskProvider.updateTask(
-                                  widget.index,
-                                  Task(
-                                      title: titleControl.text,
-                                      detail: detailControl.text,
-                                      time: DateTime.now(),
-                                      done: true));
+                          done = done ? false : true;
+                          taskProvider.updateTask(widget.index, widget.task);
                         },
                         child: Icon(
                           done
@@ -170,12 +162,13 @@ class _TaskDetailsProviderState extends State<TaskDetailsProvider> {
                       if (formKey2.currentState?.validate() ?? false) {
                         String titleTask = titleControl.text;
                         String detailTask = detailControl.text;
-                        DateTime time = DateTime.now();
+                        DateTime time = selectedDate;
                         Task task = Task(
-                            title: titleTask,
-                            detail: detailTask,
-                            time: time,
-                            done: done);
+                          title: titleTask,
+                          detail: detailTask,
+                          time: time,
+                          done: done,
+                        );
                         taskProvider.updateTask(widget.index, task);
                         Navigator.pop(context);
                       }
@@ -202,8 +195,12 @@ class TextFiild extends StatelessWidget {
   int lines;
 
   TextEditingController control = TextEditingController();
-  TextFiild(
-      {super.key, required this.hint, this.lines = 1, required this.control});
+  TextFiild({
+    super.key,
+    required this.hint,
+    this.lines = 1,
+    required this.control,
+  });
 
   @override
   Widget build(BuildContext context) {

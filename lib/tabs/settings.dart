@@ -110,7 +110,7 @@ class Settings extends StatelessWidget {
           ),
         ),
         bottomSheet: bottomSheetProvider.isBottomSheetVisible
-            ? const BottomModelProvider()
+            ? const AddTaskBottomSheet()
             : null,
       ),
     );
