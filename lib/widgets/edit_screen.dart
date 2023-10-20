@@ -4,7 +4,6 @@ import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../app_theme.dart';
-import '../providers/bottom_sheet.dart';
 import '../providers/database.dart';
 import '../task.dart';
 import '../widgets/back_ground.dart';
@@ -13,16 +12,16 @@ import '../providers/l_d_mode.dart';
 import '../providers/language.dart';
 
 // ignore: must_be_immutable
-class TaskDetailsProvider extends StatefulWidget {
+class TaskDetailsScreen extends StatefulWidget {
   Task task;
   int index;
-  TaskDetailsProvider({required this.task, super.key, required this.index});
+  TaskDetailsScreen({required this.task, super.key, required this.index});
 
   @override
-  State<TaskDetailsProvider> createState() => _TaskDetailsProviderState();
+  State<TaskDetailsScreen> createState() => _TaskDetailsScreenState();
 }
 
-class _TaskDetailsProviderState extends State<TaskDetailsProvider> {
+class _TaskDetailsScreenState extends State<TaskDetailsScreen> {
   final formKey2 = GlobalKey<FormState>();
   // ignore: non_constant_identifier_names
   late Box TaskBox;
@@ -33,21 +32,17 @@ class _TaskDetailsProviderState extends State<TaskDetailsProvider> {
   void initState() {
     super.initState();
     TaskBox = Hive.box('tasks');
-    if (widget.task.isInBox) {
-      titleControl.text = widget.task.title;
-      detailControl.text = widget.task.detail;
-    }
-  }
 
-  DateTime selectedDate = DateTime.now();
+    titleControl.text = widget.task.title;
+    detailControl.text = widget.task.detail;
+  }
 
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final languageProvider = Provider.of<LanguageProvider>(context);
     final taskProvider = Provider.of<TaskProvider>(context);
-    final bottomSheetProvider = Provider.of<BottomSheetProvider>(context);
-
+    DateTime selectedDate = widget.task.time;
     bool done = widget.task.done;
     Color cardColor = themeProvider.mode == AppTheme.darkTheme
         ? AppTheme.blackColor
@@ -106,9 +101,10 @@ class _TaskDetailsProviderState extends State<TaskDetailsProvider> {
                                 DateTime.now().add(const Duration(days: 365)));
 
                         if (chosenDate == null) return;
-                        selectedDate = chosenDate;
-                        bottomSheetProvider.setTime(selectedDate);
-                        setState(() {});
+
+                        setState(() {
+                          widget.task.time = chosenDate;
+                        });
                       },
                       child: Text(
                         AppLocalizations.of(context)!.time,

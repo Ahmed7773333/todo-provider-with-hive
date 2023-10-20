@@ -3,7 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
-import 'package:todoo_app/providers/bottom_sheet.dart';
+import 'package:todo/providers/bottom_sheet.dart';
 import '../app_theme.dart';
 import '../providers/l_d_mode.dart';
 import '../providers/language.dart';
