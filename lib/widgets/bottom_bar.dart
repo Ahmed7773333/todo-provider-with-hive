@@ -89,13 +89,17 @@ class _BottomBarScreenState extends State<BottomBarScreen> {
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
         floatingActionButton: Container(
-          decoration: BoxDecoration(
-              border: Border.all(
+          decoration: ShapeDecoration(
+            shape: OvalBorder(
+              side: BorderSide(
                 color: shadowCOlor,
                 width: 5.w,
               ),
-              borderRadius: BorderRadius.circular(35.r)),
+            ),
+          ),
           child: FloatingActionButton(
+            shape: CircleBorder(),
+            elevation: 0,
             onPressed: () {
               if (bottomSheetProvider.isBottomSheetVisible) {
                 if (AddTaskBottomSheet.formKey.currentState?.validate() ??

@@ -27,14 +27,6 @@ class ToDoListScreen extends StatefulWidget {
 }
 
 class _ToDoListScreenState extends State<ToDoListScreen> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-
-  void closeBottomSheet() {
-    if (_scaffoldKey.currentState?.isEndDrawerOpen ?? false) {
-      Provider.of<BottomSheetProvider>(context).toggleBottomSheet();
-    }
-  }
-
   var selectedDate = DateTime.now();
   Box taskBox = Hive.box('tasks');
   @override
@@ -49,17 +41,14 @@ class _ToDoListScreenState extends State<ToDoListScreen> {
       taskList.add(taskBox.getAt(i));
     }
     return Background(
-      child: GestureDetector(
-        onTap: closeBottomSheet,
-        child: Scaffold(
-          key: _scaffoldKey,
-          resizeToAvoidBottomInset: false,
-          body: Padding(
-            padding: EdgeInsets.only(
-              top: 60.h,
-              right: 22.w,
-              left: 22.w,
-            ),
+      child: Scaffold(
+        body: Padding(
+          padding: EdgeInsets.only(
+            top: 60.h,
+            right: 22.w,
+            left: 22.w,
+          ),
+          child: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -93,17 +82,19 @@ class _ToDoListScreenState extends State<ToDoListScreen> {
                   locale: languageProvider.appLocale.toLanguageTag(),
                 ),
                 SizedBox(height: 47.h),
-                Expanded(
-                  child: Builder(builder: (BuildContext context) {
-                    final filteredTasks = taskProvider.tasks
-                        .where((element) =>
-                            DateUtils.dateOnly(element.time)
-                                .millisecondsSinceEpoch ==
-                            DateUtils.dateOnly(selectedDate)
-                                .millisecondsSinceEpoch)
-                        .toList();
+                Builder(builder: (BuildContext context) {
+                  final filteredTasks = taskProvider.tasks
+                      .where((element) =>
+                          DateUtils.dateOnly(element.time)
+                              .millisecondsSinceEpoch ==
+                          DateUtils.dateOnly(selectedDate)
+                              .millisecondsSinceEpoch)
+                      .toList();
 
-                    return ListView.separated(
+                  return SizedBox(
+                    height: 620.h,
+                    width: double.infinity,
+                    child: ListView.separated(
                       itemBuilder: (BuildContext context, int index) {
                         int indexx = taskList.indexOf(filteredTasks[index]);
                         return OpenContainer(
@@ -303,16 +294,16 @@ class _ToDoListScreenState extends State<ToDoListScreen> {
                           .length,
                       separatorBuilder: (BuildContext context, int index) =>
                           SizedBox(height: 47.h),
-                    );
-                  }),
-                )
+                    ),
+                  );
+                })
               ],
             ),
           ),
-          bottomSheet: bottomSheetProvider.isBottomSheetVisible
-              ? const AddTaskBottomSheet()
-              : null,
         ),
+        bottomSheet: bottomSheetProvider.isBottomSheetVisible
+            ? const AddTaskBottomSheet()
+            : null,
       ),
     );
   }

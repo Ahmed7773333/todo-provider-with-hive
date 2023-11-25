@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:todo/splach.dart';
 
 import 'providers/bottom_sheet.dart';
 import 'providers/database.dart';
@@ -61,9 +62,10 @@ class ToDoApp extends StatelessWidget {
         locale: languageProvider.appLocale,
         debugShowCheckedModeBanner: false,
         theme: themeProvider.mode,
-        initialRoute: BottomBarScreen.routeName,
+        initialRoute: SplachScreen.routeName,
         routes: {
           BottomBarScreen.routeName: (context) => const BottomBarScreen(),
+          SplachScreen.routeName: (context) => const SplachScreen(),
         },
       ),
     );

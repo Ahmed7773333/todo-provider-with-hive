@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   static Color blueColor = const Color(0xFF5D9CEC);
@@ -25,22 +24,22 @@ class AppTheme {
       elevation: 0,
     ),
     textTheme: TextTheme(
-      bodySmall: GoogleFonts.poppins(
+      bodySmall: TextStyle(
         color: blackColor,
         fontSize: 18,
         fontWeight: FontWeight.w700,
       ),
-      bodyMedium: GoogleFonts.inter(
+      bodyMedium: TextStyle(
         color: blackColor,
         fontSize: 20,
         fontWeight: FontWeight.w400,
       ),
-      bodyLarge: GoogleFonts.poppins(
+      bodyLarge: TextStyle(
         color: lightColor,
         fontSize: 22,
         fontWeight: FontWeight.w700,
       ),
-      titleSmall: GoogleFonts.roboto(
+      titleSmall: TextStyle(
         color: blackColor,
         fontSize: 15,
         fontWeight: FontWeight.w700,
@@ -63,22 +62,22 @@ class AppTheme {
       elevation: 0,
     ),
     textTheme: TextTheme(
-      bodySmall: GoogleFonts.poppins(
+      bodySmall: TextStyle(
         color: lightColor,
         fontSize: 18,
         fontWeight: FontWeight.w700,
       ),
-      bodyMedium: GoogleFonts.inter(
+      bodyMedium: TextStyle(
         color: lightColor,
         fontSize: 20,
         fontWeight: FontWeight.w400,
       ),
-      bodyLarge: GoogleFonts.poppins(
+      bodyLarge: TextStyle(
         color: darkColor,
         fontSize: 22,
         fontWeight: FontWeight.w700,
       ),
-      titleSmall: GoogleFonts.roboto(
+      titleSmall: TextStyle(
         color: lightColor,
         fontSize: 15,
         fontWeight: FontWeight.w700,
